@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: strapi-ingress
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+      - mystrapi.com
+      secretName: auth-tls-secret
+  rules:
+  - host: mystrapi.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: strapi-service
+            port:
+              number: 443
