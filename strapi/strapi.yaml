@@ -6,8 +6,8 @@ metadata:
     app: strapi
 spec:
   ports:
-  - name: http       ##This port is where ingress connects
-    port: 80
+  - name: https       ##This port is where ingress connects
+    port: 443
     targetPort: 1337
   selector:
     app: strapi 
@@ -38,7 +38,14 @@ spec:
         envFrom:
         - secretRef:
             name: strapi-prod
-        
+        volumeMounts:
+        - name: certs
+          mountPath: "/etc/certs"
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: auth-tls-secret  
       
 
             
