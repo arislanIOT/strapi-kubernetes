@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: strapi 
-        image: arislankareem/strapi:latest
+        image: alexyib/strapi-generic:v1   
         ports:
         - name: http
           containerPort: 1337
