@@ -2,14 +2,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: strapi-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: kong
   tls:
     - hosts:
-      - mystrapi.com
-      secretName: auth-tls-secret
+      - cms.abc.com
+      secretName: strapi-ingress
   rules:
-  - host: mystrapi.com
+  - host: cms.abc.com
     http:
       paths:
       - path: /
@@ -18,4 +20,4 @@ spec:
           service:
             name: strapi-service
             port:
-              number: 443
+              number: 1337

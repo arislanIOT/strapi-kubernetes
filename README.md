@@ -1,55 +1,44 @@
-# strapi-kubernetes
-strapi project with ci and kubernetes deployment. 
+# Strapi with PostgresSQL
+---
+
+## Create namespace for strapi and pgsql
+
+    $ kubectl apply -f strapi/namespace.yaml
+
+# pgsql installation
+
+#### If the cluster is provisioned with dynamic storage we don't need to provision persistant volume and persistant volume claim manually. 
+
+## provisioning pv and pvc for the database persistant storage
 
 
-#
-$   kubectl patch pv jhooq-pv -p '{"metadata":{"finalizers":null}}'
-$   kubectl patch pvc jhooq-pv-claim -p '{"metadata":{"finalizers":null}}'
+    $ kubectl apply -f pgsql/pv.yaml -n strapi
+
+    $ kubectl apply -f pgsql/pgsql-configmap.yaml  -n strapi
+
+    $ kubectl apply -f pgsql/pgsql-deploymnet.yaml -n strapi
+
+    $ kubectl apply -f pgsql/pgsql-service.yaml -n strapi
+
+# Strapi Deployment
+
+## Create secret for strapi to connect with database. 
+
+    $ kubectl create secret generic strapi-prod --from-env-file=pgsql/.env -n strapi
+
+## Install strapi and ingress 
+
+    $ kubectl apply -f strapi/strapi.yaml -n strapi
+
+    $ kubectl apply -f strapi/strapi-ingress.yaml -n strapi
 
 
-#
+## In this repo both minimal and production level Dockerfile is provide for the custom image building of the strapi image. 
 
-kubectl port-forward --namespace default svc/psql-postgresql 5432:5432 & PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U postgres -d postgres -p 5432
+## Command to build and push strapi image
 
+    $ docker build -t repository_username/repository_name:tag  .
 
-
-
-
-# Installing Kong gateway API without DB(dbless mode) and with kong ingress controller. 
-
-$   helm install kong/kong --generate-name --set ingressController.enabled=true 
-    --set postgresql.enabled=false --set env.database=off --create-namespace --namespace=kong
-
-# Setting up strapi 
-
-1. Docker image without .env. That is need to add .dockerignore file while building the image 
-    .env
-    .cache/
-    .git/
-    build/
-    node_modules/
-    .env
-    data/
-
-    general ones, cross check with developer on the same. 
-
-$ docker build -t docker_repository_name/image_name:tag  Dockefile.prod 
-
-$ docker push docker_repository_name/image_name:tag
-
-$ generate SSL cert 
-
-# Generate secret with the SSL certs 
-
-$ kubectl create secret -n namespace tls auth-tls-secret --key auth-tls.key --cert auth-tls.crt
-
-# Split the sensitive data and general data with configmap and secrets 
-
-# Create a secret and configmap from the .env for production, here I created secret only for poc 
-
-$ kubectl create secret generic prod --from-env-file=.env
-
-
-
+    $ docker push repository_username/repository_name:tag
 
     
